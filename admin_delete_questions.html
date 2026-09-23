@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin - Delete Questions</title>
+
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4facfe,
+                    #764ba2
+                );
+
+            padding: 30px;
+        }
+
+
+        .container {
+
+            max-width: 1150px;
+
+            width: 95%;
+
+            margin: auto;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            background: white;
+
+            padding: 22px 25px;
+
+            border-radius: 18px;
+
+            margin-bottom: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 15px;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.15);
+        }
+
+
+        .header-left h1 {
+
+            color: #333;
+
+            font-size: 28px;
+
+            margin-bottom: 6px;
+        }
+
+
+        .header-left p {
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        .back {
+
+            text-decoration: none;
+
+            background: #667eea;
+
+            color: white;
+
+            padding: 11px 18px;
+
+            border-radius: 9px;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+
+        .back:hover {
+
+            background: #4f63d2;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* =====================================================
+           FLASH MESSAGE
+        ===================================================== */
+
+        .flash {
+
+            padding: 14px 18px;
+
+            border-radius: 10px;
+
+            margin-bottom: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .success {
+
+            background: #d4edda;
+
+            color: #155724;
+        }
+
+
+        .danger {
+
+            background: #f8d7da;
+
+            color: #721c24;
+        }
+
+
+        /* =====================================================
+           TOTAL BOX
+        ===================================================== */
+
+        .total-box {
+
+            background: white;
+
+            padding: 17px 20px;
+
+            border-radius: 13px;
+
+            margin-bottom: 20px;
+
+            color: #444;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 5px 15px
+                rgba(0,0,0,0.10);
+        }
+
+
+        .total-number {
+
+            display: inline-block;
+
+            background: #764ba2;
+
+            color: white;
+
+            padding: 6px 13px;
+
+            border-radius: 20px;
+
+            margin-left: 6px;
+        }
+
+
+        /* =====================================================
+           SUBJECT FOLDER
+        ===================================================== */
+
+        .subject-folder {
+
+            background: white;
+
+            border-radius: 17px;
+
+            margin-bottom: 18px;
+
+            overflow: hidden;
+
+            border-left: 6px solid #764ba2;
+
+            box-shadow:
+                0 7px 20px
+                rgba(0,0,0,0.14);
+        }
+
+
+        /* =====================================================
+           FOLDER HEADER
+        ===================================================== */
+
+        .folder-header {
+
+            padding: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            cursor: pointer;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #ffffff,
+                    #f8f5ff
+                );
+
+            transition: 0.3s;
+        }
+
+
+        .folder-header:hover {
+
+            background: #f5f1ff;
+        }
+
+
+        .folder-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .folder-icon {
+
+            width: 55px;
+
+            height: 55px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #eee8ff;
+
+            border-radius: 13px;
+
+            font-size: 29px;
+        }
+
+
+        .folder-title {
+
+            font-size: 19px;
+
+            font-weight: bold;
+
+            color: #333;
+        }
+
+
+        .folder-subtitle {
+
+            color: #888;
+
+            font-size: 13px;
+
+            margin-top: 5px;
+        }
+
+
+        .folder-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .question-count {
+
+            background: #764ba2;
+
+            color: white;
+
+            padding: 7px 13px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+
+        .arrow {
+
+            color: #764ba2;
+
+            font-size: 18px;
+
+            transition: 0.3s;
+        }
+
+
+        .subject-folder.active .arrow {
+
+            transform: rotate(180deg);
+        }
+
+
+        /* =====================================================
+           FOLDER CONTENT
+        ===================================================== */
+
+        .folder-content {
+
+            display: none;
+
+            padding: 5px 18px 20px;
+
+            background: #fafafa;
+        }
+
+
+        .subject-folder.active .folder-content {
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           QUESTION CARD
+        ===================================================== */
+
+        .question {
+
+            background: white;
+
+            padding: 18px;
+
+            margin-top: 12px;
+
+            border-radius: 13px;
+
+            border: 1px solid #e5e5e5;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.06);
+        }
+
+
+        .question-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 20px;
+        }
+
+
+        .question-content {
+
+            flex: 1;
+        }
+
+
+        .number {
+
+            display: inline-block;
+
+            background: #764ba2;
+
+            color: white;
+
+            padding: 5px 10px;
+
+            border-radius: 7px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            margin-bottom: 9px;
+        }
+
+
+        .question-text {
+
+            color: #333;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           TAGS
+        ===================================================== */
+
+        .tags {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 11px;
+        }
+
+
+        .tag {
+
+            background: #eee8ff;
+
+            color: #603f94;
+
+            padding: 5px 10px;
+
+            border-radius: 14px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           DELETE BUTTON
+        ===================================================== */
+
+        .delete-form {
+
+            flex-shrink: 0;
+        }
+
+
+        .delete {
+
+            border: none;
+
+            background: #dc3545;
+
+            color: white;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            font-size: 13px;
+
+            transition: 0.3s;
+        }
+
+
+        .delete:hover {
+
+            background: #b02a37;
+
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           EMPTY
+        ===================================================== */
+
+        .empty {
+
+            background: white;
+
+            text-align: center;
+
+            padding: 60px 30px;
+
+            border-radius: 17px;
+
+            color: #777;
+
+            box-shadow:
+                0 7px 20px
+                rgba(0,0,0,0.12);
+        }
+
+
+        .empty-icon {
+
+            font-size: 55px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .empty h2 {
+
+            color: #444;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media(max-width: 650px) {
+
+            body {
+
+                padding: 15px;
+            }
+
+
+            .container {
+
+                width: 100%;
+            }
+
+
+            .header {
+
+                padding: 18px;
+            }
+
+
+            .folder-header {
+
+                padding: 15px;
+            }
+
+
+            .folder-icon {
+
+                width: 45px;
+
+                height: 45px;
+
+                font-size: 23px;
+            }
+
+
+            .folder-title {
+
+                font-size: 16px;
+            }
+
+
+            .folder-right {
+
+                gap: 5px;
+            }
+
+
+            .question-count {
+
+                font-size: 10px;
+
+                padding: 6px 8px;
+            }
+
+
+            .question-top {
+
+                flex-direction: column;
+            }
+
+
+            .delete-form {
+
+                width: 100%;
+            }
+
+
+            .delete {
+
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="header">
+
+        <div class="header-left">
+
+            <h1>
+                🗑️ Delete Questions
+            </h1>
+
+            <p>
+                Delete questions added from the Admin panel
+            </p>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('admin_dashboard') }}"
+            class="back">
+
+            ← Admin Dashboard
+
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         FLASH MESSAGES
+    ====================================================== -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <!-- =====================================================
+         TOTAL QUESTIONS
+    ====================================================== -->
+
+    <div class="total-box">
+
+        📚 Total Questions:
+
+        <span class="total-number">
+
+            {{ total_questions }}
+
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         SUBJECT FOLDERS
+    ====================================================== -->
+
+    {% if subject_groups %}
+
+
+        {% for subject, items in subject_groups.items() %}
+
+
+            <div class="subject-folder">
+
+
+                <!-- =================================================
+                     FOLDER HEADER
+                ================================================== -->
+
+                <div
+                    class="folder-header"
+                    onclick="toggleFolder(this)">
+
+
+                    <div class="folder-left">
+
+
+                        <div class="folder-icon">
+
+                            📁
+
+                        </div>
+
+
+                        <div>
+
+                            <div class="folder-title">
+
+                                {{ subject }}
+
+                            </div>
+
+
+                            <div class="folder-subtitle">
+
+                                Click to view questions
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <div class="folder-right">
+
+
+                        <span class="question-count">
+
+                            {{ items|length }} Questions
+
+                        </span>
+
+
+                        <span class="arrow">
+
+                            ▼
+
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     QUESTIONS
+                ================================================== -->
+
+                <div class="folder-content">
+
+
+                    {% for item in items %}
+
+
+                        <div class="question">
+
+
+                            <div class="question-top">
+
+
+                                <div class="question-content">
+
+
+                                    <span class="number">
+
+                                        Question {{ loop.index }}
+
+                                    </span>
+
+
+                                    <!-- QUESTION TEXT -->
+
+                                    <div class="question-text">
+
+                                        {{ item['question'] }}
+
+                                    </div>
+
+
+                                    <!-- TAGS -->
+
+                                    <div class="tags">
+
+
+                                        <span class="tag">
+
+                                            📚
+                                            {{ item['subject'] }}
+
+                                        </span>
+
+
+                                        {% if item['section'] %}
+
+                                            <span class="tag">
+
+                                                📌
+                                                {{ item['section'] }}
+
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if item['level'] %}
+
+                                            <span class="tag">
+
+                                                🎯
+                                                {{ item['level'] }}
+
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if item['question_type'] %}
+
+                                            <span class="tag">
+
+                                                📝
+                                                {{ item['question_type'] }}
+
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if item['company'] %}
+
+                                            <span class="tag">
+
+                                                🏢
+                                                {{ item['company'] }}
+
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        {% if item['year'] %}
+
+                                            <span class="tag">
+
+                                                📅
+                                                {{ item['year'] }}
+
+                                            </span>
+
+                                        {% endif %}
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     DELETE BUTTON
+                                ================================================== -->
+
+                                <form
+
+                                    method="POST"
+
+                                    action="{{ url_for(
+                                        'admin_delete_question',
+                                        question_id=item['id']
+                                    ) }}"
+
+                                    class="delete-form"
+
+                                    onsubmit="
+                                        return confirm(
+                                            'Are you sure you want to delete this question?'
+                                        );
+                                    ">
+
+
+                                    <button
+                                        type="submit"
+                                        class="delete">
+
+                                        🗑 Delete
+
+                                    </button>
+
+
+                                </form>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            </div>
+
+
+        {% endfor %}
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             NO QUESTIONS
+        ================================================== -->
+
+        <div class="empty">
+
+            <div class="empty-icon">
+
+                📭
+
+            </div>
+
+
+            <h2>
+
+                No Questions Found
+
+            </h2>
+
+
+            <p>
+
+                Questions added from the Admin panel will
+                appear here.
+
+            </p>
+
+        </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+<script>
+
+    function toggleFolder(header) {
+
+        const folder =
+            header.parentElement;
+
+        folder.classList.toggle("active");
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

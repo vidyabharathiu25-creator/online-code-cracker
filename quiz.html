@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ subject|title }} Quiz</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4facfe, #764ba2);
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .2);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .subject {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .level {
+            color: #777;
+            margin-top: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .timer {
+            background: #222;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .warning {
+            background: #e74c3c;
+        }
+
+        .progress {
+            width: 100%;
+            height: 12px;
+            background: #ddd;
+            border-radius: 20px;
+            margin: 25px 0;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            background: #667eea;
+            border-radius: 20px;
+            transition: width .3s ease;
+        }
+
+        .count {
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .question {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        /* ==========================================
+           COMPANY / YEAR / TOPIC TAGS
+           ========================================== */
+
+        .question-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .company-tag {
+            background: #e8f0ff;
+            color: #2563eb;
+        }
+
+        .year-tag {
+            background: #e8fff1;
+            color: #15803d;
+        }
+
+        .topic-tag {
+            background: #fff4df;
+            color: #c2410c;
+        }
+
+        /* ==========================================
+           PASSAGE
+           ========================================== */
+
+        .passage {
+            background: #f5f7fa;
+            border-left: 5px solid #764ba2;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .passage strong {
+            color: #764ba2;
+        }
+
+        .passage p {
+            margin-top: 8px;
+        }
+
+        /* ==========================================
+           SPEAK BUTTON
+           ========================================== */
+
+        .speak {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .speak:hover {
+            background: #138496;
+        }
+
+        /* ==========================================
+           OPTIONS
+           ========================================== */
+
+        .option {
+            display: block;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: .3s;
+            font-size: 17px;
+        }
+
+        .option:hover {
+            background: #f5f7ff;
+            border-color: #667eea;
+        }
+
+        .option input {
+            margin-right: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        /* ==========================================
+           OPTION ERROR MESSAGE
+           ========================================== */
+
+        .option-error {
+            display: none;
+            background: #fff1f1;
+            color: #d63031;
+            border: 2px solid #ff7675;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .option-error.show {
+            display: block;
+        }
+
+        /* ==========================================
+           HIGHLIGHT OPTIONS WHEN NOT SELECTED
+           ========================================== */
+
+        .option.error-option {
+            border-color: #ff7675;
+            background: #fff8f8;
+        }
+
+        /* ==========================================
+           ACTION BUTTONS
+           ========================================== */
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #4f5bd5;
+        }
+
+        .secondary {
+            background: #ddd;
+            color: #333;
+        }
+
+        .secondary:hover {
+            background: #bbb;
+        }
+
+        /* ==========================================
+           MOBILE
+           ========================================== */
+
+        @media(max-width:700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .timer {
+                align-self: center;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- ==========================================
+         HEADER
+         ========================================== -->
+
+    <div class="header">
+
+        <div>
+
+            <div class="subject">
+
+                {% if subject == "Aptitude" %}
+
+                    📊 Aptitude
+
+                {% elif subject == "Logical Reasoning" %}
+
+                    🧠 Logical Reasoning
+
+                {% elif subject == "Verbal Ability" %}
+
+                    📖 Verbal Ability
+
+                {% elif subject == "Reading Comprehension" %}
+
+                    📚 Reading Comprehension
+
+                {% else %}
+
+                    📝 {{ subject }}
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="level">
+
+                {% if level|lower == "easy" %}
+
+                    🟢 Easy Level
+
+                {% elif level|lower == "medium" %}
+
+                    🟠 Medium Level
+
+                {% elif level|lower == "hard" %}
+
+                    🔴 Hard Level
+
+                {% else %}
+
+                    Level: {{ level|title }}
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div id="timer" class="timer">
+
+            ⏱️ <span id="time">00:00</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         PROGRESS BAR
+         ========================================== -->
+
+    <div class="progress">
+
+        <div class="bar"
+             style="width: {{ (current_question / total_questions * 100)|round(0) }}%;">
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         QUESTION COUNT
+         ========================================== -->
+
+    <div class="count">
+
+        Question {{ current_question }} of {{ total_questions }}
+
+    </div>
+
+
+    <!-- ==========================================
+         QUIZ FORM
+         ========================================== -->
+
+    <form id="quizForm" method="POST">
+
+
+        <!-- ======================================
+             COMPANY / YEAR / TOPIC
+             ====================================== -->
+
+        <div class="question-tags">
+
+            {% if question.company %}
+
+                <span class="tag company-tag">
+
+                    🏢 {{ question.company }}
+
+                </span>
+
+            {% endif %}
+
+
+            {% if question.year %}
+
+                <span class="tag year-tag">
+
+                    📅 {{ question.year }}
+
+                </span>
+
+            {% endif %}
+
+
+            {% if question.topic %}
+
+                <span class="tag topic-tag">
+
+                    📚 {{ question.topic }}
+
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ======================================
+             PASSAGE
+             ====================================== -->
+
+        {% if question.passage %}
+
+            <div class="passage">
+
+                <strong>📖 Passage</strong>
+
+                <p>
+
+                    {{ question.passage }}
+
+                </p>
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- ======================================
+             QUESTION
+             ====================================== -->
+
+        <div class="question" id="questionText">
+
+            {{ question.question }}
+
+        </div>
+
+
+        <!-- ======================================
+             READ QUESTION BUTTON
+             ====================================== -->
+
+        <button
+            type="button"
+            class="speak"
+            onclick="readQuestion()">
+
+            🔊 Read Question
+
+        </button>
+
+
+        <!-- ======================================
+             OPTIONS
+             ====================================== -->
+
+        {% for option in question.options %}
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="{{ option }}"
+                    {% if selected_answer == option %}checked{% endif %}>
+
+                {{ option }}
+
+            </label>
+
+        {% endfor %}
+
+
+        <!-- ======================================
+             ERROR MESSAGE
+             ====================================== -->
+
+        <div
+            id="optionError"
+            class="option-error">
+
+            ⚠️ Please select an option before continuing.
+
+        </div>
+
+
+        <!-- ======================================
+             ACTION BUTTONS
+             ====================================== -->
+
+        <div class="actions">
+
+
+            {% if has_previous %}
+
+                <button
+                    type="submit"
+                    class="btn secondary"
+                    name="action"
+                    value="previous">
+
+                    ← Previous
+
+                </button>
+
+            {% endif %}
+
+
+            <!-- SKIP DOES NOT REQUIRE OPTION -->
+
+            <button
+                type="submit"
+                class="btn secondary"
+                name="action"
+                value="skip">
+
+                Skip
+
+            </button>
+
+
+            {% if current_question < total_questions %}
+
+                <button
+                    type="submit"
+                    class="btn primary"
+                    name="action"
+                    value="next">
+
+                    Next →
+
+                </button>
+
+            {% else %}
+
+                <button
+                    type="submit"
+                    class="btn primary"
+                    name="action"
+                    value="next">
+
+                    Submit Quiz ✓
+
+                </button>
+
+            {% endif %}
+
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   READ QUESTION
+   ========================================== */
+
+function readQuestion() {
+
+    if ("speechSynthesis" in window) {
+
+        speechSynthesis.cancel();
+
+        let questionElement =
+            document.getElementById("questionText");
+
+        let text =
+            questionElement.innerText;
+
+        let speech =
+            new SpeechSynthesisUtterance(text);
+
+        speech.lang = "en-US";
+
+        speech.rate = 1;
+
+        speech.pitch = 1;
+
+        speechSynthesis.speak(speech);
+
+    } else {
+
+        alert(
+            "Text-to-speech is not supported in this browser."
+        );
+
+    }
+
+}
+
+
+/* ==========================================
+   TIMER
+   ========================================== */
+
+let remaining =
+    {{ remaining_time|int }};
+
+let done = false;
+
+
+const timeDisplay =
+    document.getElementById("time");
+
+
+const timer =
+    document.getElementById("timer");
+
+
+const form =
+    document.getElementById("quizForm");
+
+
+function updateTimer() {
+
+    let minutes =
+        Math.floor(remaining / 60);
+
+
+    let seconds =
+        remaining % 60;
+
+
+    timeDisplay.innerHTML =
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(seconds).padStart(2, "0");
+
+
+    if (remaining <= 60) {
+
+        timer.classList.add("warning");
+
+    }
+
+}
+
+
+/* ==========================================
+   SHOW TIMER IMMEDIATELY
+   ========================================== */
+
+updateTimer();
+
+
+/* ==========================================
+   START COUNTDOWN
+   ========================================== */
+
+let timerId =
+    setInterval(function() {
+
+        remaining--;
+
+        updateTimer();
+
+
+        if (remaining <= 0) {
+
+            clearInterval(timerId);
+
+
+            if (!done) {
+
+                done = true;
+
+
+                let input =
+                    document.createElement("input");
+
+
+                input.type = "hidden";
+
+
+                input.name = "action";
+
+
+                input.value = "timeout";
+
+
+                form.appendChild(input);
+
+
+                form.submit();
+
+            }
+
+        }
+
+    }, 1000);
+
+
+/* ==========================================
+   OPTION VALIDATION
+   ========================================== */
+
+form.addEventListener(
+    "submit",
+    function(event) {
+
+        /*
+         * Find which button was clicked.
+         */
+
+        let clickedButton =
+            event.submitter;
+
+
+        /*
+         * Get the action.
+         */
+
+        let action =
+            clickedButton
+                ? clickedButton.value
+                : "";
+
+
+        /*
+         * Previous does NOT require an answer.
+         */
+
+        if (action === "previous") {
+
+            done = true;
+
+            clearInterval(timerId);
+
+            return;
+
+        }
+
+
+        /*
+         * Skip does NOT require an answer.
+         */
+
+        if (action === "skip") {
+
+            done = true;
+
+            clearInterval(timerId);
+
+            return;
+
+        }
+
+
+        /*
+         * Timeout does NOT require an answer.
+         */
+
+        if (action === "timeout") {
+
+            return;
+
+        }
+
+
+        /*
+         * Next / Submit requires an option.
+         */
+
+        if (
+            action === "next"
+        ) {
+
+            let selectedOption =
+                document.querySelector(
+                    'input[name="answer"]:checked'
+                );
+
+
+            /*
+             * If no option is selected,
+             * STOP FORM SUBMISSION.
+             */
+
+            if (!selectedOption) {
+
+                event.preventDefault();
+
+
+                /*
+                 * Show error message.
+                 */
+
+                let error =
+                    document.getElementById(
+                        "optionError"
+                    );
+
+                error.classList.add("show");
+
+
+                /*
+                 * Highlight all options.
+                 */
+
+                let options =
+                    document.querySelectorAll(
+                        ".option"
+                    );
+
+
+                options.forEach(function(option) {
+
+                    option.classList.add(
+                        "error-option"
+                    );
+
+                });
+
+
+                /*
+                 * Scroll to error message.
+                 */
+
+                error.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+
+                /*
+                 * Make sure timer continues.
+                 */
+
+                done = false;
+
+
+                return false;
+
+            }
+
+
+            /*
+             * An option was selected.
+             * Remove error.
+             */
+
+            let error =
+                document.getElementById(
+                    "optionError"
+                );
+
+
+            error.classList.remove(
+                "show"
+            );
+
+
+            /*
+             * Remove red border.
+             */
+
+            let options =
+                document.querySelectorAll(
+                    ".option"
+                );
+
+
+            options.forEach(function(option) {
+
+                option.classList.remove(
+                    "error-option"
+                );
+
+            });
+
+
+            /*
+             * Allow submission.
+             */
+
+            done = true;
+
+            clearInterval(timerId);
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   REMOVE ERROR WHEN USER SELECTS OPTION
+   ========================================== */
+
+let radioButtons =
+    document.querySelectorAll(
+        'input[name="answer"]'
+    );
+
+
+radioButtons.forEach(function(radio) {
+
+    radio.addEventListener(
+        "change",
+        function() {
+
+            let error =
+                document.getElementById(
+                    "optionError"
+                );
+
+
+            /*
+             * Hide error message.
+             */
+
+            error.classList.remove(
+                "show"
+            );
+
+
+            /*
+             * Remove red borders.
+             */
+
+            let options =
+                document.querySelectorAll(
+                    ".option"
+                );
+
+
+            options.forEach(function(option) {
+
+                option.classList.remove(
+                    "error-option"
+                );
+
+            });
+
+        }
+    );
+
+});
+
+
+/* ==========================================
+   STOP SPEECH WHEN LEAVING PAGE
+   ========================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function() {
+
+        if (
+            "speechSynthesis" in window
+        ) {
+
+            speechSynthesis.cancel();
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+</html>
