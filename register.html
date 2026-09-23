@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Quiz Master - Register</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+
+<body class="register-body">
+
+
+<div class="register-container">
+
+
+    <!-- =====================================================
+         LEFT PANEL
+    ====================================================== -->
+
+    <div class="register-left">
+
+        <div class="brand-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+
+
+        <h1>Quiz Master</h1>
+
+
+        <p class="tagline">
+            AI Powered Online Quiz System
+        </p>
+
+
+        <div class="login-features">
+
+            <div>
+                <i class="fas fa-brain"></i>
+                <span>AI Performance Analysis</span>
+            </div>
+
+            <div>
+                <i class="fas fa-stopwatch"></i>
+                <span>Timer Based Quiz</span>
+            </div>
+
+            <div>
+                <i class="fas fa-chart-line"></i>
+                <span>Track Your Progress</span>
+            </div>
+
+            <div>
+                <i class="fas fa-envelope"></i>
+                <span>Email Result Report</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         RIGHT PANEL
+    ====================================================== -->
+
+    <div class="register-card">
+
+
+        <h2>Create Account 👋</h2>
+
+
+        <p class="login-subtitle">
+            Register to start your learning journey.
+        </p>
+
+
+
+        <!-- =================================================
+             ERROR MESSAGE
+        ================================================== -->
+
+        {% if error %}
+
+        <div class="error-message">
+            <i class="fas fa-circle-exclamation"></i>
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             SUCCESS MESSAGE
+        ================================================== -->
+
+        {% if success %}
+
+        <div class="success-message">
+            <i class="fas fa-circle-check"></i>
+            {{ success }}
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             STEP 1
+             FULL NAME + EMAIL
+        ================================================== -->
+
+        {% if step == 1 %}
+
+        <div class="registration-step">
+
+
+            <div class="step-heading">
+
+                <span class="step-number">
+                    1
+                </span>
+
+                <div>
+
+                    <strong>
+                        Verify Your Email
+                    </strong>
+
+                    <small>
+                        Enter your name and email address
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <form method="POST"
+                  id="emailForm">
+
+
+                <input type="hidden"
+                       name="action"
+                       value="send_code">
+
+
+
+                <!-- FULL NAME -->
+
+                <div class="input-group-custom">
+
+                    <i class="fas fa-user"></i>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Full Name"
+                        required
+                        autocomplete="name">
+
+                </div>
+
+
+
+                <!-- EMAIL -->
+
+                <div class="input-group-custom">
+
+                    <i class="fas fa-envelope"></i>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Email Address"
+                        required
+                        autocomplete="email">
+
+                </div>
+
+
+
+                <!-- SEND CODE -->
+
+                <button
+                    type="submit"
+                    class="login-button ripple">
+
+                    <i class="fas fa-paper-plane"></i>
+
+                    Send Code
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             STEP 2
+             VERIFY EMAIL CODE
+        ================================================== -->
+
+        {% if step == 2 %}
+
+        <div class="registration-step">
+
+
+            <div class="step-heading">
+
+                <span class="step-number">
+                    2
+                </span>
+
+                <div>
+
+                    <strong>
+                        Verify Your Email
+                    </strong>
+
+                    <small>
+                        Enter the code sent to your email
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- EMAIL INFORMATION -->
+
+            {% if session.get("pending_registration") %}
+
+            <div class="email-sent-info">
+
+                <i class="fas fa-envelope-circle-check"></i>
+
+                <span>
+                    Verification code sent to
+                    <strong>
+                        {{ session["pending_registration"]["email"] }}
+                    </strong>
+                </span>
+
+            </div>
+
+            {% endif %}
+
+
+
+            <!-- VERIFY FORM -->
+
+            <form method="POST"
+                  id="verifyForm">
+
+
+                <input type="hidden"
+                       name="action"
+                       value="verify_code">
+
+
+
+                <!-- VERIFICATION CODE -->
+
+                <div class="input-group-custom verification-input">
+
+                    <i class="fas fa-shield-halved"></i>
+
+                    <input
+                        type="text"
+                        id="verification_code"
+                        name="verification_code"
+                        placeholder="Enter 6-digit code"
+                        maxlength="6"
+                        minlength="6"
+                        pattern="[0-9]{6}"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        required
+                        autofocus>
+
+                </div>
+
+
+
+                <!-- VERIFY BUTTON -->
+
+                <button
+                    type="submit"
+                    class="login-button ripple">
+
+                    <i class="fas fa-check-circle"></i>
+
+                    Verify Email
+
+                </button>
+
+
+            </form>
+
+
+
+            <!-- =================================================
+                 RESEND CODE
+            ================================================== -->
+
+            <form method="POST"
+                  id="resendForm"
+                  class="resend-form">
+
+
+                <input type="hidden"
+                       name="action"
+                       value="send_code">
+
+
+                <input type="hidden"
+                       name="name"
+                       value="{{ session.get('pending_registration', {}).get('name', '') }}">
+
+
+                <input type="hidden"
+                       name="email"
+                       value="{{ session.get('pending_registration', {}).get('email', '') }}">
+
+
+                <button
+                    type="submit"
+                    class="resend-button"
+                    id="resendButton">
+
+                    <i class="fas fa-rotate-right"></i>
+
+                    Resend Code
+
+                </button>
+
+
+            </form>
+
+
+
+            <div class="verification-note">
+
+                <i class="fas fa-clock"></i>
+
+                Verification code is valid for 10 minutes.
+
+            </div>
+
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             STEP 3
+             USERNAME + PASSWORD
+        ================================================== -->
+
+        {% if step == 3 %}
+
+        <div class="registration-step">
+
+
+            <div class="step-heading">
+
+                <span class="step-number">
+                    3
+                </span>
+
+                <div>
+
+                    <strong>
+                        Create Your Account
+                    </strong>
+
+                    <small>
+                        Set your username and password
+                    </small>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- VERIFIED EMAIL -->
+
+            <div class="verified-email">
+
+                <i class="fas fa-circle-check"></i>
+
+                <span>
+                    Email verified successfully
+                </span>
+
+            </div>
+
+
+
+            <form method="POST"
+                  id="registerForm">
+
+
+                <input type="hidden"
+                       name="action"
+                       value="create_account">
+
+
+
+                <!-- USERNAME -->
+
+                <div class="input-group-custom">
+
+                    <i class="fas fa-user-tag"></i>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Username"
+                        minlength="3"
+                        required
+                        autocomplete="username">
+
+                </div>
+
+
+
+                <!-- USERNAME MESSAGE -->
+
+                <div id="usernameMessage"
+                     class="username-message">
+                </div>
+
+
+
+                <!-- PASSWORD -->
+
+                <div class="input-group-custom password-box">
+
+                    <i class="fas fa-lock"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Password"
+                        minlength="6"
+                        required
+                        autocomplete="new-password">
+
+                    <i
+                        class="fas fa-eye toggle-password"
+                        id="togglePassword">
+                    </i>
+
+                </div>
+
+
+
+                <!-- CONFIRM PASSWORD -->
+
+                <div class="input-group-custom password-box">
+
+                    <i class="fas fa-lock"></i>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        name="confirm_password"
+                        placeholder="Confirm Password"
+                        minlength="6"
+                        required
+                        autocomplete="new-password">
+
+                    <i
+                        class="fas fa-eye toggle-confirm"
+                        id="toggleConfirm">
+                    </i>
+
+                </div>
+
+
+
+                <!-- CREATE ACCOUNT -->
+
+                <button
+                    type="submit"
+                    class="login-button ripple">
+
+                    <i class="fas fa-user-plus"></i>
+
+                    Create Account
+
+                </button>
+
+
+            </form>
+
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             BOTTOM SECTION
+        ================================================== -->
+
+        {% if step == 1 %}
+
+        <!-- STEP 1 ONLY:
+             LOGIN LINK
+             NO FORGOT PASSWORD
+        -->
+
+        <div class="demo-login step-one-bottom">
+
+            <strong>
+                Already have an account?
+            </strong>
+
+            <a href="{{ url_for('login') }}">
+                Login Here
+            </a>
+
+        </div>
+
+        {% endif %}
+
+
+
+        {% if step == 2 %}
+
+        <!-- STEP 2:
+             NO LOGIN
+             NO FORGOT PASSWORD
+             RESEND CODE IS ABOVE
+        -->
+
+        <div class="step-two-bottom">
+
+            <i class="fas fa-envelope"></i>
+
+            <span>
+                Didn't receive the code?
+            </span>
+
+            <strong>
+                Click "Resend Code"
+            </strong>
+
+        </div>
+
+        {% endif %}
+
+
+
+        {% if step == 3 %}
+
+        <!-- STEP 3:
+             LOGIN LINK ONLY
+        -->
+
+        <div class="demo-login step-three-bottom">
+
+            <strong>
+                Already have an account?
+            </strong>
+
+            <a href="{{ url_for('login') }}">
+                Login Here
+            </a>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     ADDITIONAL STYLES
+====================================================== -->
+
+<style>
+
+
+/* =====================================================
+   REGISTRATION STEP
+====================================================== */
+
+.registration-step {
+    width: 100%;
+}
+
+
+
+/* =====================================================
+   STEP HEADING
+====================================================== */
+
+.step-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 22px;
+
+    padding: 12px 14px;
+
+    background: rgba(91, 110, 225, 0.08);
+
+    border-radius: 10px;
+}
+
+
+.step-number {
+
+    width: 34px;
+
+    height: 34px;
+
+    min-width: 34px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #4facfe,
+        #764ba2
+    );
+
+    color: white;
+
+    font-weight: 700;
+
+    font-size: 15px;
+}
+
+
+.step-heading strong {
+
+    display: block;
+
+    color: #333;
+
+    font-size: 15px;
+}
+
+
+.step-heading small {
+
+    display: block;
+
+    color: #888;
+
+    font-size: 12px;
+
+    margin-top: 2px;
+}
+
+
+
+/* =====================================================
+   SUCCESS MESSAGE
+====================================================== */
+
+.success-message {
+
+    padding: 12px 15px;
+
+    margin-bottom: 18px;
+
+    border-radius: 9px;
+
+    background: #e7f8ed;
+
+    color: #15803d;
+
+    border: 1px solid #b7ebc6;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.success-message i {
+
+    margin-right: 6px;
+
+}
+
+
+
+/* =====================================================
+   ERROR MESSAGE
+====================================================== */
+
+.error-message {
+
+    padding: 12px 15px;
+
+    margin-bottom: 18px;
+
+    border-radius: 9px;
+
+    background: #ffe8e8;
+
+    color: #d32f2f;
+
+    border: 1px solid #ffcaca;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.error-message i {
+
+    margin-right: 6px;
+
+}
+
+
+
+/* =====================================================
+   EMAIL SENT INFORMATION
+====================================================== */
+
+.email-sent-info {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    margin-bottom: 16px;
+
+    padding: 11px 13px;
+
+    border-radius: 9px;
+
+    background: #eef5ff;
+
+    border: 1px solid #cddfff;
+
+    color: #52647a;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+
+.email-sent-info i {
+
+    color: #4facfe;
+
+    font-size: 17px;
+
+}
+
+
+.email-sent-info strong {
+
+    color: #4f46a5;
+
+    word-break: break-word;
+
+}
+
+
+
+/* =====================================================
+   VERIFICATION INPUT
+====================================================== */
+
+.verification-input input {
+
+    text-align: center;
+
+    font-size: 22px;
+
+    font-weight: 600;
+
+    letter-spacing: 7px;
+}
+
+
+
+/* =====================================================
+   RESEND FORM
+====================================================== */
+
+.resend-form {
+
+    margin-top: 12px;
+
+    width: 100%;
+}
+
+
+
+/* =====================================================
+   RESEND BUTTON
+====================================================== */
+
+.resend-button {
+
+    width: 100%;
+
+    padding: 11px 15px;
+
+    border: 1px solid #d7dcf5;
+
+    border-radius: 9px;
+
+    background: white;
+
+    color: #5b6ee1;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+
+.resend-button:hover {
+
+    background: #f3f5ff;
+
+    border-color: #667eea;
+
+    transform: translateY(-1px);
+}
+
+
+.resend-button i {
+
+    margin-right: 7px;
+
+}
+
+
+
+/* =====================================================
+   VERIFICATION NOTE
+====================================================== */
+
+.verification-note {
+
+    margin-top: 13px;
+
+    padding: 8px;
+
+    text-align: center;
+
+    color: #777;
+
+    font-size: 12px;
+}
+
+
+.verification-note i {
+
+    margin-right: 5px;
+
+    color: #667eea;
+}
+
+
+
+/* =====================================================
+   VERIFIED EMAIL
+====================================================== */
+
+.verified-email {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 10px;
+
+    margin-bottom: 17px;
+
+    border-radius: 9px;
+
+    background: #e7f8ed;
+
+    border: 1px solid #b7ebc6;
+
+    color: #15803d;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.verified-email i {
+
+    font-size: 15px;
+
+}
+
+
+
+/* =====================================================
+   USERNAME MESSAGE
+====================================================== */
+
+.username-message {
+
+    display: none;
+
+    font-size: 13px;
+
+    margin: -8px 0 12px 5px;
+
+}
+
+
+.username-message.show {
+
+    display: block;
+
+}
+
+
+
+/* =====================================================
+   STEP 2 BOTTOM
+====================================================== */
+
+.step-two-bottom {
+
+    margin-top: 20px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #eee;
+
+    text-align: center;
+
+    color: #777;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+.step-two-bottom i {
+
+    color: #667eea;
+
+    margin-right: 4px;
+
+}
+
+
+.step-two-bottom strong {
+
+    display: block;
+
+    color: #5b6ee1;
+
+}
+
+
+
+/* =====================================================
+   BOTTOM LOGIN
+====================================================== */
+
+.demo-login {
+
+    text-align: center;
+
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #eee;
+
+    color: #555;
+
+    font-size: 13px;
+}
+
+
+.demo-login strong {
+
+    color: #555;
+
+}
+
+
+.demo-login a {
+
+    color: #5b6ee1;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    margin-left: 4px;
+}
+
+
+.demo-login a:hover {
+
+    text-decoration: underline;
+
+}
+
+
+
+/* =====================================================
+   BUTTON ICON
+====================================================== */
+
+.login-button i {
+
+    margin-right: 7px;
+
+}
+
+
+
+/* =====================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 768px) {
+
+    .step-heading {
+
+        padding: 10px;
+
+    }
+
+
+    .verification-input input {
+
+        font-size: 19px;
+
+        letter-spacing: 5px;
+
+    }
+
+}
+
+</style>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+====================================================== -->
+
+<script>
+
+
+/* =====================================================
+   STEP 1
+   EMAIL FORMAT VALIDATION
+====================================================== */
+
+const emailForm =
+    document.getElementById("emailForm");
+
+
+if (emailForm) {
+
+    emailForm.addEventListener(
+        "submit",
+        function(event) {
+
+            const name =
+                document.getElementById("name");
+
+            const email =
+                document.getElementById("email");
+
+
+            const nameValue =
+                name.value.trim();
+
+
+            const emailValue =
+                email.value.trim().toLowerCase();
+
+
+            /* NAME CHECK */
+
+            if (nameValue.length < 2) {
+
+                event.preventDefault();
+
+                name.setCustomValidity(
+                    "Please enter your full name."
+                );
+
+                name.reportValidity();
+
+                return false;
+
+            }
+
+            else {
+
+                name.setCustomValidity("");
+
+            }
+
+
+            /* EMAIL FORMAT */
+
+            const emailPattern =
+                /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+
+            if (!emailPattern.test(emailValue)) {
+
+                event.preventDefault();
+
+                email.setCustomValidity(
+                    "Please enter a valid email address."
+                );
+
+                email.reportValidity();
+
+                return false;
+
+            }
+
+
+            /* DOUBLE DOT CHECK */
+
+            if (emailValue.includes("..")) {
+
+                event.preventDefault();
+
+                email.setCustomValidity(
+                    "Please enter a valid email address."
+                );
+
+                email.reportValidity();
+
+                return false;
+
+            }
+
+
+            email.setCustomValidity("");
+
+            email.value = emailValue;
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   STEP 2
+   OTP VALIDATION
+====================================================== */
+
+const verifyForm =
+    document.getElementById("verifyForm");
+
+
+if (verifyForm) {
+
+    const verificationCode =
+        document.getElementById(
+            "verification_code"
+        );
+
+
+    /* ONLY NUMBERS */
+
+    verificationCode.addEventListener(
+        "input",
+        function() {
+
+            this.value =
+                this.value.replace(
+                    /[^0-9]/g,
+                    ""
+                ).slice(0, 6);
+
+            this.setCustomValidity("");
+
+        }
+    );
+
+
+    verifyForm.addEventListener(
+        "submit",
+        function(event) {
+
+            const value =
+                verificationCode.value.trim();
+
+
+            if (!/^[0-9]{6}$/.test(value)) {
+
+                event.preventDefault();
+
+                verificationCode.setCustomValidity(
+                    "Please enter the 6-digit verification code."
+                );
+
+                verificationCode.reportValidity();
+
+                return false;
+
+            }
+
+
+            verificationCode.setCustomValidity("");
+
+            verificationCode.value = value;
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   STEP 2
+   RESEND CODE BUTTON
+====================================================== */
+
+const resendForm =
+    document.getElementById("resendForm");
+
+
+const resendButton =
+    document.getElementById("resendButton");
+
+
+if (resendForm && resendButton) {
+
+    resendForm.addEventListener(
+        "submit",
+        function() {
+
+            resendButton.disabled = true;
+
+            resendButton.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Sending Code...';
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   STEP 3
+   USERNAME VALIDATION
+====================================================== */
+
+const username =
+    document.getElementById("username");
+
+
+const usernameMessage =
+    document.getElementById(
+        "usernameMessage"
+    );
+
+
+if (username) {
+
+    username.addEventListener(
+        "input",
+        function() {
+
+            const value =
+                username.value.trim();
+
+
+            if (value.length === 0) {
+
+                usernameMessage.style.display =
+                    "none";
+
+                usernameMessage.textContent =
+                    "";
+
+                username.setCustomValidity("");
+
+                return;
+
+            }
+
+
+            if (value.length < 3) {
+
+                usernameMessage.style.display =
+                    "block";
+
+                usernameMessage.style.color =
+                    "#e53935";
+
+                usernameMessage.textContent =
+                    "Username must contain at least 3 characters.";
+
+                username.setCustomValidity(
+                    "Username must contain at least 3 characters."
+                );
+
+            }
+
+            else {
+
+                usernameMessage.style.display =
+                    "block";
+
+                usernameMessage.style.color =
+                    "#16a34a";
+
+                usernameMessage.textContent =
+                    "✓ Username is valid.";
+
+                username.setCustomValidity("");
+
+            }
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   STEP 3
+   CREATE ACCOUNT FORM
+====================================================== */
+
+const registerForm =
+    document.getElementById(
+        "registerForm"
+    );
+
+
+if (registerForm) {
+
+    registerForm.addEventListener(
+        "submit",
+        function(event) {
+
+            username.value =
+                username.value.trim();
+
+
+            if (username.value.length < 3) {
+
+                event.preventDefault();
+
+                username.setCustomValidity(
+                    "Username must contain at least 3 characters."
+                );
+
+                username.reportValidity();
+
+                return false;
+
+            }
+
+
+            username.setCustomValidity("");
+
+        }
+    );
+
+}
+
+
+
+/* =====================================================
+   PASSWORD SHOW / HIDE
+====================================================== */
+
+const password =
+    document.getElementById(
+        "password"
+    );
+
+
+const togglePassword =
+    document.getElementById(
+        "togglePassword"
+    );
+
+
+if (password && togglePassword) {
+
+    togglePassword.onclick =
+        function() {
+
+            if (
+                password.type ===
+                "password"
+            ) {
+
+                password.type =
+                    "text";
+
+                this.classList.replace(
+                    "fa-eye",
+                    "fa-eye-slash"
+                );
+
+            }
+
+            else {
+
+                password.type =
+                    "password";
+
+                this.classList.replace(
+                    "fa-eye-slash",
+                    "fa-eye"
+                );
+
+            }
+
+        };
+
+}
+
+
+
+/* =====================================================
+   CONFIRM PASSWORD SHOW / HIDE
+====================================================== */
+
+const confirmPassword =
+    document.getElementById(
+        "confirmPassword"
+    );
+
+
+const toggleConfirm =
+    document.getElementById(
+        "toggleConfirm"
+    );
+
+
+if (
+    confirmPassword &&
+    toggleConfirm
+) {
+
+    toggleConfirm.onclick =
+        function() {
+
+            if (
+                confirmPassword.type ===
+                "password"
+            ) {
+
+                confirmPassword.type =
+                    "text";
+
+                this.classList.replace(
+                    "fa-eye",
+                    "fa-eye-slash"
+                );
+
+            }
+
+            else {
+
+                confirmPassword.type =
+                    "password";
+
+                this.classList.replace(
+                    "fa-eye-slash",
+                    "fa-eye"
+                );
+
+            }
+
+        };
+
+}
+
+
+
+/* =====================================================
+   CONFIRM PASSWORD VALIDATION
+====================================================== */
+
+if (
+    confirmPassword &&
+    password
+) {
+
+
+    confirmPassword.addEventListener(
+        "input",
+        function() {
+
+            if (
+                confirmPassword.value !==
+                password.value
+            ) {
+
+                confirmPassword.setCustomValidity(
+                    "Passwords do not match."
+                );
+
+            }
+
+            else {
+
+                confirmPassword.setCustomValidity("");
+
+            }
+
+        }
+    );
+
+
+
+    password.addEventListener(
+        "input",
+        function() {
+
+            if (
+                confirmPassword.value !== ""
+            ) {
+
+                if (
+                    confirmPassword.value !==
+                    password.value
+                ) {
+
+                    confirmPassword.setCustomValidity(
+                        "Passwords do not match."
+                    );
+
+                }
+
+                else {
+
+                    confirmPassword.setCustomValidity("");
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

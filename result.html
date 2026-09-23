@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
+    <title>Quiz Result</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            padding: 25px 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4facfe,
+                    #764ba2
+                );
+
+            font-family: Arial, sans-serif;
+
+            min-height: 100vh;
+        }
+
+
+        .wrap {
+
+            max-width: 1100px;
+
+            margin: auto;
+        }
+
+
+        .card {
+
+            background: #fff;
+
+            border-radius: 22px;
+
+            padding: 24px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 15px 35px #0003;
+        }
+
+
+        /* =====================================================
+           RESULT HEADER
+        ===================================================== */
+
+        .hero {
+
+            text-align: center;
+
+            padding: 30px;
+        }
+
+
+        .hero h1 {
+
+            margin: 0 0 8px 0;
+
+            color: #333;
+
+            font-size: 30px;
+        }
+
+
+        .hero p {
+
+            color: #666;
+
+            font-size: 16px;
+
+            margin: 8px 0;
+        }
+
+
+        .completed {
+
+            display: inline-block;
+
+            margin-top: 10px;
+
+            background: #dff6e7;
+
+            color: #16803c;
+
+            padding: 8px 18px;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+        }
+
+
+        .timeout {
+
+            display: inline-block;
+
+            margin-top: 10px;
+
+            background: #ffe3e3;
+
+            color: #c0392b;
+
+            padding: 8px 18px;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(160px, 1fr)
+                );
+
+            gap: 14px;
+        }
+
+
+        .stat {
+
+            background: #f5f7ff;
+
+            border-radius: 15px;
+
+            padding: 18px;
+
+            text-align: center;
+
+            transition: 0.3s;
+        }
+
+
+        .stat:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow:
+                0 8px 20px #0002;
+        }
+
+
+        .num {
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            color: #667eea;
+
+            margin-bottom: 5px;
+        }
+
+
+        .stat-label {
+
+            color: #555;
+
+            font-weight: bold;
+        }
+
+
+        /* =====================================================
+           COGNITIVE LEVEL
+        ===================================================== */
+
+        .cognitive-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            text-align: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #f5f0ff
+                );
+
+            border: 2px solid #764ba2;
+        }
+
+
+        .cognitive-card::before {
+
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+
+            height: 180px;
+
+            background: #764ba222;
+
+            border-radius: 50%;
+
+            top: -90px;
+
+            right: -70px;
+        }
+
+
+        .cognitive-card::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 140px;
+
+            height: 140px;
+
+            background: #4facfe22;
+
+            border-radius: 50%;
+
+            bottom: -70px;
+
+            left: -50px;
+        }
+
+
+        .cognitive-content {
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+
+        .brain {
+
+            font-size: 48px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .cognitive-title {
+
+            font-size: 18px;
+
+            color: #666;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+
+        .cognitive-level {
+
+            display: inline-block;
+
+            padding: 12px 30px;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #667eea,
+                    #764ba2
+                );
+
+            color: white;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            box-shadow:
+                0 8px 20px #764ba255;
+        }
+
+
+        .cognitive-message {
+
+            max-width: 650px;
+
+            margin: 15px auto 0;
+
+            color: #555;
+
+            line-height: 1.6;
+
+            font-size: 15px;
+        }
+
+
+        .cognitive-score {
+
+            margin-top: 12px;
+
+            color: #667eea;
+
+            font-weight: bold;
+
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           PERFORMANCE CHART
+        ===================================================== */
+
+        .chart {
+
+            margin-top: 15px;
+        }
+
+
+        .row {
+
+            display: grid;
+
+            grid-template-columns:
+                100px 1fr 60px;
+
+            gap: 10px;
+
+            align-items: center;
+
+            margin: 12px 0;
+        }
+
+
+        .track {
+
+            height: 14px;
+
+            background: #eee;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+
+        .fill {
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #4facfe,
+                    #764ba2
+                );
+
+            border-radius: 10px;
+
+            transition: width 0.8s ease;
+        }
+
+
+        /* =====================================================
+           ML ANALYSIS
+        ===================================================== */
+
+        .ai {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(200px, 1fr)
+                );
+
+            gap: 14px;
+        }
+
+
+        .item {
+
+            background: #f5f7ff;
+
+            border-radius: 15px;
+
+            padding: 16px;
+
+            text-align: left;
+
+            border: 1px solid #e5e7f5;
+        }
+
+
+        .item b {
+
+            display: block;
+
+            color: #666;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+        }
+
+
+        .item-value {
+
+            color: #333;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           ANSWER REVIEW
+        ===================================================== */
+
+        .review-card {
+
+            background: #f8f9ff;
+
+            border-radius: 18px;
+
+            padding: 20px;
+
+            margin-bottom: 18px;
+
+            border: 1px solid #e5e7f5;
+        }
+
+
+        .review-number {
+
+            display: inline-block;
+
+            background: #667eea;
+
+            color: white;
+
+            padding: 7px 13px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+        }
+
+
+        .review-question {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+
+            margin-bottom: 15px;
+
+            color: #333;
+        }
+
+
+        /* =====================================================
+           PASSAGE
+        ===================================================== */
+
+        .passage-box {
+
+            background: #eef2ff;
+
+            border-left: 6px solid #667eea;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin: 15px 0;
+        }
+
+
+        .passage-title {
+
+            margin: 0 0 10px 0;
+
+            color: #4b55a5;
+
+            font-size: 17px;
+
+            font-weight: bold;
+        }
+
+
+        .passage-text {
+
+            margin: 0;
+
+            line-height: 1.7;
+
+            color: #333;
+
+            text-align: justify;
+        }
+
+
+        /* =====================================================
+           ANSWER DETAILS
+        ===================================================== */
+
+        .answer-row {
+
+            margin: 10px 0;
+
+            padding: 12px;
+
+            border-radius: 10px;
+
+            background: #fff;
+
+            border: 1px solid #eee;
+        }
+
+
+        .answer-label {
+
+            font-weight: bold;
+
+            color: #555;
+        }
+
+
+        .correct-answer {
+
+            color: #16803c;
+
+            font-weight: bold;
+        }
+
+
+        .user-answer {
+
+            font-weight: bold;
+
+            color: #333;
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 7px 14px;
+
+            border-radius: 20px;
+
+            font-weight: bold;
+
+            margin-top: 8px;
+        }
+
+
+        .status-correct {
+
+            background: #dff6e7;
+
+            color: #16803c;
+        }
+
+
+        .status-wrong {
+
+            background: #ffe3e3;
+
+            color: #c0392b;
+        }
+
+
+        .status-skipped {
+
+            background: #fff1cc;
+
+            color: #946200;
+        }
+
+
+        /* =====================================================
+           EXPLANATION
+        ===================================================== */
+
+        .explanation {
+
+            margin-top: 15px;
+
+            background: #fff;
+
+            border-left: 5px solid #f5a623;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            line-height: 1.6;
+        }
+
+
+        .explanation-title {
+
+            font-weight: bold;
+
+            color: #b56b00;
+
+            margin-bottom: 6px;
+        }
+
+
+        .explanation p {
+
+            margin: 0;
+
+            color: #333;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+
+        .buttons {
+
+            text-align: center;
+
+            padding-bottom: 30px;
+        }
+
+
+        .btn {
+
+            display: inline-block;
+
+            padding: 12px 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #667eea,
+                    #764ba2
+                );
+
+            color: #fff;
+
+            text-decoration: none;
+
+            border-radius: 22px;
+
+            margin: 5px;
+
+            font-weight: bold;
+
+            transition: 0.3s;
+        }
+
+
+        .btn:hover {
+
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 8px 18px #0003;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            body {
+
+                padding: 15px 8px;
+            }
+
+
+            .card {
+
+                padding: 18px;
+            }
+
+
+            .hero h1 {
+
+                font-size: 25px;
+            }
+
+
+            .review-question {
+
+                font-size: 16px;
+            }
+
+
+            .row {
+
+                grid-template-columns:
+                    75px 1fr 45px;
+
+                gap: 6px;
+
+                font-size: 13px;
+            }
+
+
+            .cognitive-level {
+
+                font-size: 23px;
+
+                padding: 10px 24px;
+            }
+
+
+            .brain {
+
+                font-size: 42px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="wrap">
+
+
+    <!-- =====================================================
+         RESULT HEADER
+    ====================================================== -->
+
+    <div class="card hero">
+
+        <h1>
+            🎉 Quiz Result
+        </h1>
+
+
+        <p>
+            <strong>{{ subject }}</strong>
+            •
+            <strong>{{ level }}</strong>
+        </p>
+
+
+        {% if timeout %}
+
+            <span class="timeout">
+                ⏰ Time Out
+            </span>
+
+        {% else %}
+
+            <span class="completed">
+                ✓ Quiz Completed
+            </span>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <div class="card">
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div class="num">
+                    {{ total }}
+                </div>
+
+                <div class="stat-label">
+                    Total
+                </div>
+
+            </div>
+
+
+
+            <div class="stat">
+
+                <div class="num">
+                    {{ correct }}
+                </div>
+
+                <div class="stat-label">
+                    Correct
+                </div>
+
+            </div>
+
+
+
+            <div class="stat">
+
+                <div class="num">
+                    {{ wrong }}
+                </div>
+
+                <div class="stat-label">
+                    Wrong
+                </div>
+
+            </div>
+
+
+
+            <div class="stat">
+
+                <div class="num">
+                    {{ skipped }}
+                </div>
+
+                <div class="stat-label">
+                    Skipped
+                </div>
+
+            </div>
+
+
+
+            <div class="stat">
+
+                <div class="num">
+
+                    {{ ai_analysis.get('accuracy', percentage)|default(percentage) }}%
+
+                </div>
+
+                <div class="stat-label">
+                    Accuracy
+                </div>
+
+            </div>
+
+
+
+            <div class="stat">
+
+                <div class="num">
+                    {{ time_taken|default(0) }}s
+                </div>
+
+                <div class="stat-label">
+                    Time
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         COGNITIVE LEVEL
+    ====================================================== -->
+
+    <div class="card cognitive-card">
+
+        <div class="cognitive-content">
+
+
+            <div class="brain">
+                🧠
+            </div>
+
+
+            <div class="cognitive-title">
+                Your Cognitive Level
+            </div>
+
+
+            <div class="cognitive-level">
+
+                {{ cognitive_level|default(ai_analysis.get('cognitive_level', 'Not Available')) }}
+
+            </div>
+
+
+            <div class="cognitive-score">
+
+                Your Score:
+                {{ percentage }}%
+
+            </div>
+
+
+            <div class="cognitive-message">
+
+                {{ cognitive_message|default(
+                    "Your cognitive level is calculated based on your quiz performance."
+                ) }}
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         PERFORMANCE CHART
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📊 Performance Chart
+        </h2>
+
+
+        {% set cp =
+            (correct / total * 100)
+            if total else 0
+        %}
+
+
+        {% set wp =
+            (wrong / total * 100)
+            if total else 0
+        %}
+
+
+        {% set sp =
+            (skipped / total * 100)
+            if total else 0
+        %}
+
+
+
+        <div class="chart">
+
+
+            <!-- CORRECT -->
+
+            <div class="row">
+
+                <b>
+                    Correct
+                </b>
+
+
+                <div class="track">
+
+                    <div
+                        class="fill"
+                        style="width:{{ cp }}%">
+                    </div>
+
+                </div>
+
+
+                <span>
+                    {{ cp|round(0) }}%
+                </span>
+
+            </div>
+
+
+
+            <!-- WRONG -->
+
+            <div class="row">
+
+                <b>
+                    Wrong
+                </b>
+
+
+                <div class="track">
+
+                    <div
+                        class="fill"
+                        style="width:{{ wp }}%">
+                    </div>
+
+                </div>
+
+
+                <span>
+                    {{ wp|round(0) }}%
+                </span>
+
+            </div>
+
+
+
+            <!-- SKIPPED -->
+
+            <div class="row">
+
+                <b>
+                    Skipped
+                </b>
+
+
+                <div class="track">
+
+                    <div
+                        class="fill"
+                        style="width:{{ sp }}%">
+                    </div>
+
+                </div>
+
+
+                <span>
+                    {{ sp|round(0) }}%
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ML ANALYSIS
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            🤖 ML Performance Analysis
+        </h2>
+
+        <br>
+
+
+        <div class="ai">
+
+
+            {% for label, key in [
+
+                ('Prediction','prediction'),
+
+                ('Confidence','confidence'),
+
+                ('Performance Score','performance_score'),
+
+                ('Cognitive Level','cognitive_level'),
+
+                ('Recommended Level','recommended_level'),
+
+                ('Strength','strength'),
+
+                ('Weakness','weakness'),
+
+                ('Learning Profile','learning_profile'),
+
+                ('Average Response Time','average_response_time'),
+
+                ('Recommendation','recommendation')
+
+            ] %}
+
+
+            <div class="item">
+
+
+                <b>
+                    {{ label }}
+                </b>
+
+
+                <div class="item-value">
+
+                    {{ ai_analysis.get(key, cognitive_level if key == 'cognitive_level' else 'Not Available') }}
+
+                    {% if key in ['confidence', 'performance_score'] %}
+
+                        %
+
+                    {% elif key == 'average_response_time' %}
+
+                        seconds/question
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ANSWER REVIEW
+    ====================================================== -->
+
+    <div class="card">
+
+        <h2>
+            📝 Answer Review
+        </h2>
+
+
+        <p>
+            Review your answers and read the explanation
+            for each question.
+        </p>
+
+
+        <br>
+
+
+
+        {% if review %}
+
+
+            {% for x in review %}
+
+
+            <div class="review-card">
+
+
+                <!-- QUESTION NUMBER -->
+
+                <div class="review-number">
+
+                    Question {{ x.number }}
+
+                </div>
+
+
+
+                <!-- PASSAGE -->
+
+                {% if x.passage %}
+
+                <div class="passage-box">
+
+
+                    <div class="passage-title">
+
+                        📖 Passage
+
+                    </div>
+
+
+                    <p class="passage-text">
+
+                        {{ x.passage }}
+
+                    </p>
+
+
+                </div>
+
+                {% endif %}
+
+
+
+                <!-- QUESTION -->
+
+                <div class="review-question">
+
+                    {{ x.question }}
+
+                </div>
+
+
+
+                <!-- YOUR ANSWER -->
+
+                <div class="answer-row">
+
+
+                    <span class="answer-label">
+
+                        Your Answer:
+
+                    </span>
+
+
+                    <span class="user-answer">
+
+                        {{ x.user_answer }}
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- CORRECT ANSWER -->
+
+                <div class="answer-row">
+
+
+                    <span class="answer-label">
+
+                        Correct Answer:
+
+                    </span>
+
+
+                    <span class="correct-answer">
+
+                        {{ x.correct_answer }}
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <div>
+
+
+                    {% if x.status == "Correct" %}
+
+
+                    <span class="status status-correct">
+
+                        ✓ Correct
+
+                    </span>
+
+
+                    {% elif x.status == "Wrong" %}
+
+
+                    <span class="status status-wrong">
+
+                        ✗ Wrong
+
+                    </span>
+
+
+                    {% else %}
+
+
+                    <span class="status status-skipped">
+
+                        ⏭ Skipped
+
+                    </span>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                <!-- EXPLANATION -->
+
+                {% if x.explanation %}
+
+                <div class="explanation">
+
+
+                    <div class="explanation-title">
+
+                        💡 Explanation
+
+                    </div>
+
+
+                    <p>
+
+                        {{ x.explanation }}
+
+                    </p>
+
+
+                </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="review-card">
+
+                <p>
+                    No answer review is available.
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+
+    <!-- =====================================================
+         BUTTONS
+    ====================================================== -->
+
+    <div class="buttons">
+
+
+        <a
+            class="btn"
+            href="{{ url_for('dashboard') }}">
+
+            🏠 Dashboard
+
+        </a>
+
+
+
+        <a
+            class="btn"
+            href="{{ url_for('history') }}">
+
+            📊 History
+
+        </a>
+
+
+
+        <a
+            class="btn"
+            href="{{ url_for('profile') }}">
+
+            👤 Profile
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
