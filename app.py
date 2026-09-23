@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 import random
 from flask import session, flash
-from flask_mail import Message
 
 
 import re
@@ -14,8 +13,8 @@ import time
 from werkzeug.security import generate_password_hash
 
 from dotenv import load_dotenv
-from flask_mail import Mail, Message
-
+import resend
+from ml_model import complete_ai_analysis
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -40,55 +39,45 @@ app.secret_key = os.getenv(
 # ============================================================
 # EMAIL CONFIGURATION
 # ============================================================
-# ============================================================
-# EMAIL CONFIGURATION
-# ============================================================
 
-app.config["MAIL_SERVER"] = "smtp.gmail.com"
+resend.api_key = os.getenv("RESEND_API_KEY")
 
-app.config["MAIL_PORT"] = 587
+RESEND_FROM_EMAIL = os.getenv(
+    "RESEND_FROM_EMAIL",
+    "onboarding@resend.dev"
+)
 
-app.config["MAIL_USE_TLS"] = True
-
-app.config["MAIL_USE_SSL"] = False
-
-app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
-
-app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
-
-app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
-
-# TEST_EMAIL is optional. If not set, /test-email sends to the
-# configured MAIL_USERNAME account.
-mail = Mail(app)
 
 @app.route("/test-email")
 def test_email():
 
+    test_email_address = os.getenv("TEST_EMAIL")
+
+    if not resend.api_key:
+        return "EMAIL FAILED: RESEND_API_KEY is missing."
+
+    if not test_email_address:
+        return "EMAIL FAILED: TEST_EMAIL is missing."
+
     try:
-        msg = Message(
-            subject="Online Quiz Master - Test Email",
-            sender=app.config["MAIL_USERNAME"],
-            recipients=[os.getenv("TEST_EMAIL", app.config["MAIL_USERNAME"])]
-        )
-
-        msg.body = """
-Hello,
-
-This is a test email from Online Quiz Master.
-
-If you received this email, Flask-Mail is working correctly.
-
-Thank you.
-"""
-
-        mail.send(msg)
+        resend.Emails.send({
+            "from": RESEND_FROM_EMAIL,
+            "to": [test_email_address],
+            "subject": "Online Quiz Master - Test Email",
+            "html": """
+            <h2>Online Quiz Master - Test Email</h2>
+            <p>Hello,</p>
+            <p>This is a test email from Online Quiz Master.</p>
+            <p>If you received this email, the email API is working correctly.</p>
+            <p>Thank you.</p>
+            """
+        })
 
         print("========================================")
         print("EMAIL SENT SUCCESSFULLY")
         print("========================================")
 
-        return "EMAIL SENT SUCCESSFULLY! Check your Gmail inbox."
+        return "EMAIL SENT SUCCESSFULLY! Check your email inbox."
 
     except Exception as e:
 
@@ -98,6 +87,8 @@ Thank you.
         print("========================================")
 
         return f"EMAIL FAILED: {str(e)}"
+
+
 # ============================================================
 # DATABASE CONNECTION
 # ============================================================
@@ -232,81 +223,50 @@ def send_result_email(
 ):
 
     if not email:
+        raise ValueError("User email address is empty.")
 
-        raise ValueError(
-            "User email address is empty."
-        )
-
-    if not app.config["MAIL_USERNAME"]:
-
-        raise ValueError(
-            "MAIL_USERNAME is missing from .env"
-        )
-
-    if not app.config["MAIL_PASSWORD"]:
-
-        raise ValueError(
-            "MAIL_PASSWORD is missing from .env"
-        )
+    if not resend.api_key:
+        raise ValueError("RESEND_API_KEY is missing.")
 
     if timeout:
-
         status = "TIME OUT"
-
     else:
-
         status = "QUIZ COMPLETED"
 
+    resend.Emails.send({
+        "from": RESEND_FROM_EMAIL,
+        "to": [email],
+        "subject": "Online Quiz Master - Quiz Result",
+        "html": f"""
+        <h2>Online Quiz Master - Quiz Result</h2>
 
-    message = Message(
+        <p>Hello {username},</p>
 
-        subject="Online Quiz Master - Quiz Result",
+        <p>Your Online Quiz Master result is ready.</p>
 
-        sender=app.config["MAIL_USERNAME"],
+        <hr>
 
-        recipients=[email]
+        <p><b>Subject:</b> {subject}</p>
+        <p><b>Level:</b> {level}</p>
+        <p><b>Status:</b> {status}</p>
 
-    )
+        <hr>
 
+        <p><b>Total Questions:</b> {total}</p>
+        <p><b>Correct Answers:</b> {correct}</p>
+        <p><b>Wrong Answers:</b> {wrong}</p>
+        <p><b>Skipped Questions:</b> {skipped}</p>
+        <p><b>Performance Score:</b> {performance_score}%</p>
+        <p><b>Cognitive Level:</b> {cognitive_level}</p>
 
-    message.body = f"""
-Hello {username},
+        <hr>
 
-Your Online Quiz Master result is ready.
+        <p>Thank you for using Online Quiz Master.</p>
+        <p>Keep learning and keep practicing!</p>
 
-========================================
-
-Subject: {subject}
-
-Level: {level}
-
-Status: {status}
-
-========================================
-
-Total Questions: {total}
-
-Correct Answers: {correct}
-
-Wrong Answers: {wrong}
-
-Skipped Questions: {skipped}
-
-Performance Score: {performance_score}%
-
-Cognitive Level: {cognitive_level}
-
-========================================
-
-Thank you for using Online Quiz Master.
-
-Keep learning and keep practicing!
-
-Online Quiz Master
-"""
-
-
-    mail.send(message)
+        <p><b>Online Quiz Master</b></p>
+        """
+    })
 
     print()
     print("========================================")
@@ -415,29 +375,20 @@ def register():
 
             try:
 
-                message = Message(
-                    subject="Quiz Master - Email Verification Code",
-                    recipients=[email]
-                )
-
-                message.body = f"""
-Hello {name},
-
-Welcome to Quiz Master!
-
-Your email verification code is:
-
-{verification_code}
-
-This code is valid for 10 minutes.
-
-Please do not share this code with anyone.
-
-Thank you,
-Quiz Master
-"""
-
-                mail.send(message)
+                resend.Emails.send({
+                    "from": RESEND_FROM_EMAIL,
+                    "to": [email],
+                    "subject": "Quiz Master - Email Verification Code",
+                    "html": f"""
+                    <h2>Welcome to Quiz Master!</h2>
+                    <p>Hello {name},</p>
+                    <p>Your email verification code is:</p>
+                    <h1>{verification_code}</h1>
+                    <p>This code is valid for 10 minutes.</p>
+                    <p>Please do not share this code with anyone.</p>
+                    <p>Thank you,<br>Quiz Master</p>
+                    """
+                })
 
             except Exception as e:
 
@@ -531,27 +482,20 @@ Quiz Master
 
             try:
 
-                message = Message(
-                    subject="Quiz Master - New Email Verification Code",
-                    recipients=[email]
-                )
-
-                message.body = f"""
-Hello {name},
-
-Your new Quiz Master email verification code is:
-
-{verification_code}
-
-This code is valid for 10 minutes.
-
-Please do not share this code with anyone.
-
-Thank you,
-Quiz Master
-"""
-
-                mail.send(message)
+                resend.Emails.send({
+                    "from": RESEND_FROM_EMAIL,
+                    "to": [email],
+                    "subject": "Quiz Master - New Email Verification Code",
+                    "html": f"""
+                    <h2>Quiz Master</h2>
+                    <p>Hello {name},</p>
+                    <p>Your new email verification code is:</p>
+                    <h1>{verification_code}</h1>
+                    <p>This code is valid for 10 minutes.</p>
+                    <p>Please do not share this code with anyone.</p>
+                    <p>Thank you,<br>Quiz Master</p>
+                    """
+                })
 
             except Exception as e:
 
@@ -6702,25 +6646,19 @@ def forgot_password():
 
         session["reset_email"] = email
 
-        msg = Message(
-            "Quiz Master Password Reset OTP",
-            sender=app.config["MAIL_USERNAME"],
-            recipients=[email]
-        )
-
-        msg.body = f"""
-Hello,
-
-Your OTP for resetting your password is:
-
-{otp}
-
-This OTP is valid for 10 minutes.
-
-Quiz Master
-"""
-
-        mail.send(msg)
+        resend.Emails.send({
+            "from": RESEND_FROM_EMAIL,
+            "to": [email],
+            "subject": "Quiz Master Password Reset OTP",
+            "html": f"""
+            <h2>Quiz Master Password Reset</h2>
+            <p>Hello,</p>
+            <p>Your OTP for resetting your password is:</p>
+            <h1>{otp}</h1>
+            <p>This OTP is valid for 10 minutes.</p>
+            <p>Quiz Master</p>
+            """
+        })
 
         return redirect(
             url_for("verify_otp")
@@ -7168,7 +7106,7 @@ if __name__ == "__main__":
 
     print(
         "Mail sender:",
-        app.config["MAIL_USERNAME"]
+        RESEND_FROM_EMAIL
     )
 
     print("========================================")
