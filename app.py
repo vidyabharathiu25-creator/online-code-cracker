@@ -15,7 +15,7 @@ from werkzeug.security import generate_password_hash
 
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
-from ml_model import complete_ai_analysis
+
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, flash
@@ -45,12 +45,19 @@ app.secret_key = os.getenv(
 # ============================================================
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
+
 app.config["MAIL_PORT"] = 587
+
+app.config["MAIL_TIMEOUT"] = 30
+
 app.config["MAIL_USE_TLS"] = True
+
 app.config["MAIL_USE_SSL"] = False
 
 app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+
 app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+
 app.config["MAIL_DEFAULT_SENDER"] = os.getenv("MAIL_USERNAME")
 
 # TEST_EMAIL is optional. If not set, /test-email sends to the
