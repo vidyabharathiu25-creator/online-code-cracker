@@ -20,7 +20,7 @@ from ml_model import complete_ai_analysis
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 app = Flask(__name__)
-app.secret_key = "242716"
+app.secret_key = o.getenv("SECRET_KEY")
 
 
 # ============================================================
