@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Leaderboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+
+body{
+    background:#f4f7fb;
+    font-family:Arial;
+    margin:0;
+    padding:30px;
+}
+
+.container{
+    width:90%;
+    margin:auto;
+}
+
+h1{
+    text-align:center;
+    color:#333;
+}
+
+table{
+    width:100%;
+    margin-top:30px;
+    border-collapse:collapse;
+    background:white;
+    box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+
+th{
+    background:#667eea;
+    color:white;
+    padding:15px;
+}
+
+td{
+    padding:15px;
+    text-align:center;
+    border-bottom:1px solid #ddd;
+}
+
+tr:nth-child(1){
+    background:#fff3b0;
+}
+
+tr:nth-child(2){
+    background:#eeeeee;
+}
+
+tr:nth-child(3){
+    background:#f6d6b8;
+}
+
+.back{
+    display:inline-block;
+    margin-top:20px;
+    padding:12px 20px;
+    background:#667eea;
+    color:white;
+    text-decoration:none;
+    border-radius:8px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>
+
+🏆 Quiz Leaderboard
+
+</h1>
+
+<table>
+
+<tr>
+
+<th>Rank</th>
+
+<th>Student</th>
+
+<th>Subject</th>
+
+<th>Score</th>
+
+<th>Accuracy</th>
+
+</tr>
+
+{% for row in leaders %}
+
+<tr>
+
+<td>{{ loop.index }}</td>
+
+<td>{{ row.username }}</td>
+
+<td>{{ row.subject }}</td>
+
+<td>{{ row.correct }}/{{ row.total }}</td>
+
+<td>{{ row.accuracy }}%</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<a class="back" href="{{ url_for('dashboard') }}">
+
+← Back to Dashboard
+
+</a>
+
+</div>
+
+</body>
+
+</html>
