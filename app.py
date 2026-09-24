@@ -93,9 +93,16 @@ def test_email():
 # DATABASE CONNECTION
 # ============================================================
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE_DIR = os.path.join(BASE_DIR, "database")
+DATABASE_PATH = os.path.join(DATABASE_DIR, "quiz.db")
+
+os.makedirs(DATABASE_DIR, exist_ok=True)
+
+
 def get_db_connection():
 
-    conn = sqlite3.connect("database/quiz.db")
+    conn = sqlite3.connect(DATABASE_PATH)
 
     conn.row_factory = sqlite3.Row
 
